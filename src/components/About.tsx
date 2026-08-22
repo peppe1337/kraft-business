@@ -3,7 +3,7 @@ import { motion, useScroll, useTransform, MotionValue } from 'framer-motion'
 import { WordsPullUpMultiStyle } from './WordsPullUp'
 
 const BODY_TEXT =
-  'Over the last seven years, I have worked with Parallax, a Berlin-based production house that crafts cinema, series, and Noir Studio in Paris. Together, we have created work that has earned international acclaim at several major festivals.'
+  'I work in finance, investor relations and operations for a DeFi platform, publish board games through Koalla Spiele, and run my day-to-day operations on autonomous AI agents - from bookkeeping to project management. One venture, Nakama, is run by an AI agent with me acting as its board. Based in Germany, working in German and English.'
 
 function AnimatedLetter({
   char,
@@ -34,15 +34,17 @@ export default function About() {
   return (
     <section className="bg-black px-4 md:px-6 py-4 md:py-6">
       <div className="bg-[#101010] rounded-2xl md:rounded-[2rem] max-w-6xl mx-auto text-center px-6 sm:px-10 md:px-16 py-16 sm:py-20 md:py-28">
-        <p className="text-primary text-[10px] sm:text-xs mb-8 sm:mb-12">Visual arts</p>
+        <p className="text-primary text-[10px] sm:text-xs mb-8 sm:mb-12">
+          Finance &times; AI operations
+        </p>
 
         <WordsPullUpMultiStyle
           className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl xl:text-7xl max-w-3xl mx-auto leading-[0.95] sm:leading-[0.9] gap-x-[0.25em]"
           segments={[
-            { text: 'I am Marcus Chen,', className: 'font-normal text-primary' },
-            { text: 'a self-taught director.', className: 'italic font-serif text-primary' },
+            { text: 'I am Chris Kraft,', className: 'font-normal text-primary' },
+            { text: 'a finance operator.', className: 'italic font-serif text-primary' },
             {
-              text: 'I have skills in color grading, visual effects, and narrative design.',
+              text: 'I build and run businesses on AI agents.',
               className: 'font-normal text-primary',
             },
           ]}
