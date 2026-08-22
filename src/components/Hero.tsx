@@ -1,7 +1,9 @@
-// import { motion } from 'framer-motion'
+import { motion } from 'framer-motion'
 // import { ArrowRight } from 'lucide-react'
 // import { WordsPullUp } from './WordsPullUp'
 import MusicPlayer from './MusicPlayer'
+import NameTag from './NameTag'
+import AgentTicker from './AgentTicker'
 
 // const NAV_ITEMS = ['Our story', 'Collective', 'Workshops', 'Programs', 'Inquiries']
 
@@ -22,6 +24,18 @@ export default function Hero() {
         />
         <div className="noise-overlay absolute inset-0 opacity-[0.7] mix-blend-overlay pointer-events-none" />
         <div className="absolute inset-0 bg-gradient-to-b from-black/30 via-transparent to-black/60 pointer-events-none" />
+
+        <NameTag />
+
+        {/* Agent status ticker, bottom right */}
+        <motion.div
+          className="absolute bottom-4 right-4 sm:bottom-6 sm:right-6"
+          initial={{ y: 20, opacity: 0 }}
+          animate={{ y: 0, opacity: 1 }}
+          transition={{ delay: 0.5, duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
+        >
+          <AgentTicker />
+        </motion.div>
 
         <MusicPlayer />
 

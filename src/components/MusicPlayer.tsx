@@ -7,7 +7,6 @@ const TRACK_TITLE = 'Lost Rupee Drift'
 export default function MusicPlayer() {
   const audioRef = useRef<HTMLAudioElement>(null)
   const canvasRef = useRef<HTMLCanvasElement>(null)
-  const pillRef = useRef<HTMLDivElement>(null)
   const audioCtxRef = useRef<AudioContext | null>(null)
   const analyserRef = useRef<AnalyserNode | null>(null)
   const rafRef = useRef<number>(0)
@@ -46,33 +45,6 @@ export default function MusicPlayer() {
       setPlaying(false)
     }
   }
-
-  // Start the music on the visitor's first interaction anywhere on the
-  // page (browsers only allow audio after a user gesture). Interactions
-  // on the player pill itself are left to the play/pause button.
-  useEffect(() => {
-    const onFirstInteraction = (e: Event) => {
-      removeListeners()
-      if (
-        pillRef.current &&
-        e.target instanceof Node &&
-        pillRef.current.contains(e.target)
-      ) {
-        return
-      }
-      if (audioRef.current?.paused) {
-        void startPlayback().catch(() => {})
-      }
-    }
-    const removeListeners = () => {
-      window.removeEventListener('pointerdown', onFirstInteraction)
-      window.removeEventListener('keydown', onFirstInteraction)
-    }
-    window.addEventListener('pointerdown', onFirstInteraction)
-    window.addEventListener('keydown', onFirstInteraction)
-    return removeListeners
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [])
 
   useEffect(() => {
     if (!playing) return
@@ -160,10 +132,7 @@ export default function MusicPlayer() {
       />
 
       {/* Player pill, bottom left */}
-      <div
-        ref={pillRef}
-        className="absolute bottom-4 left-4 sm:bottom-6 sm:left-6 flex items-center gap-3 bg-black/60 backdrop-blur-md rounded-full pl-1.5 pr-4 py-1.5"
-      >
+      <div className="absolute bottom-4 left-4 sm:bottom-6 sm:left-6 flex items-center gap-3 bg-black/60 backdrop-blur-md rounded-full pl-1.5 pr-4 py-1.5">
         <button
           onClick={toggle}
           aria-label={playing ? 'Pause' : 'Play'}
