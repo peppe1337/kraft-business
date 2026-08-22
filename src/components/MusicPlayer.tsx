@@ -7,36 +7,72 @@ const TRACK_TITLE = 'Lost Rupee Drift'
 export default function MusicPlayer() {
   const audioRef = useRef<HTMLAudioElement>(null)
   const canvasRef = useRef<HTMLCanvasElement>(null)
+  const pillRef = useRef<HTMLDivElement>(null)
   const audioCtxRef = useRef<AudioContext | null>(null)
   const analyserRef = useRef<AnalyserNode | null>(null)
   const rafRef = useRef<number>(0)
   const [playing, setPlaying] = useState(false)
 
+  const ensureAudioGraph = () => {
+    const audio = audioRef.current
+    if (!audio || audioCtxRef.current) return
+    const ctx = new AudioContext()
+    const source = ctx.createMediaElementSource(audio)
+    const analyser = ctx.createAnalyser()
+    analyser.fftSize = 512
+    analyser.smoothingTimeConstant = 0.82
+    source.connect(analyser)
+    analyser.connect(ctx.destination)
+    audioCtxRef.current = ctx
+    analyserRef.current = analyser
+  }
+
+  const startPlayback = async () => {
+    const audio = audioRef.current
+    if (!audio) return
+    ensureAudioGraph()
+    await audioCtxRef.current!.resume()
+    await audio.play()
+    setPlaying(true)
+  }
+
   const toggle = async () => {
     const audio = audioRef.current
     if (!audio) return
-
-    if (!audioCtxRef.current) {
-      const ctx = new AudioContext()
-      const source = ctx.createMediaElementSource(audio)
-      const analyser = ctx.createAnalyser()
-      analyser.fftSize = 512
-      analyser.smoothingTimeConstant = 0.82
-      source.connect(analyser)
-      analyser.connect(ctx.destination)
-      audioCtxRef.current = ctx
-      analyserRef.current = analyser
-    }
-    await audioCtxRef.current.resume()
-
     if (audio.paused) {
-      await audio.play()
-      setPlaying(true)
+      await startPlayback()
     } else {
       audio.pause()
       setPlaying(false)
     }
   }
+
+  // Start the music on the visitor's first interaction anywhere on the
+  // page (browsers only allow audio after a user gesture). Interactions
+  // on the player pill itself are left to the play/pause button.
+  useEffect(() => {
+    const onFirstInteraction = (e: Event) => {
+      removeListeners()
+      if (
+        pillRef.current &&
+        e.target instanceof Node &&
+        pillRef.current.contains(e.target)
+      ) {
+        return
+      }
+      if (audioRef.current?.paused) {
+        void startPlayback().catch(() => {})
+      }
+    }
+    const removeListeners = () => {
+      window.removeEventListener('pointerdown', onFirstInteraction)
+      window.removeEventListener('keydown', onFirstInteraction)
+    }
+    window.addEventListener('pointerdown', onFirstInteraction)
+    window.addEventListener('keydown', onFirstInteraction)
+    return removeListeners
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
 
   useEffect(() => {
     if (!playing) return
@@ -124,7 +160,10 @@ export default function MusicPlayer() {
       />
 
       {/* Player pill, bottom left */}
-      <div className="absolute bottom-4 left-4 sm:bottom-6 sm:left-6 flex items-center gap-3 bg-black/60 backdrop-blur-md rounded-full pl-1.5 pr-4 py-1.5">
+      <div
+        ref={pillRef}
+        className="absolute bottom-4 left-4 sm:bottom-6 sm:left-6 flex items-center gap-3 bg-black/60 backdrop-blur-md rounded-full pl-1.5 pr-4 py-1.5"
+      >
         <button
           onClick={toggle}
           aria-label={playing ? 'Pause' : 'Play'}
