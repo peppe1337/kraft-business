@@ -1,8 +1,10 @@
 import { useEffect, useRef, useState } from 'react'
-import { Pause, Play } from 'lucide-react'
+import { Pause, Play, SkipForward } from 'lucide-react'
 
-const TRACK_URL = '/lost-rupee-drift.mp3'
-const TRACK_TITLE = 'Lost Rupee Drift'
+const TRACKS = [
+  { url: '/lost-rupee-drift.mp3', title: 'Lost Rupee Drift' },
+  { url: '/stand-with-me-now.mp3', title: 'Stand with me now' },
+]
 
 export default function MusicPlayer() {
   const audioRef = useRef<HTMLAudioElement>(null)
@@ -11,6 +13,8 @@ export default function MusicPlayer() {
   const analyserRef = useRef<AnalyserNode | null>(null)
   const rafRef = useRef<number>(0)
   const [playing, setPlaying] = useState(false)
+  const [track, setTrack] = useState(0)
+  const resumeRef = useRef(false)
 
   const ensureAudioGraph = () => {
     const audio = audioRef.current
@@ -45,6 +49,26 @@ export default function MusicPlayer() {
       setPlaying(false)
     }
   }
+
+  const nextTrack = () => {
+    setTrack((t) => (t + 1) % TRACKS.length)
+  }
+
+  // A track running to its end always means "keep the radio on",
+  // regardless of any play-state drift.
+  const onTrackEnded = () => {
+    resumeRef.current = true
+    nextTrack()
+  }
+
+  // When the track changes while the radio is on, keep playing the new one.
+  useEffect(() => {
+    if (playing || resumeRef.current) {
+      resumeRef.current = false
+      void startPlayback().catch(() => setPlaying(false))
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [track])
 
   useEffect(() => {
     if (!playing) return
@@ -121,7 +145,8 @@ export default function MusicPlayer() {
 
   return (
     <>
-      <audio ref={audioRef} src={TRACK_URL} onEnded={() => setPlaying(false)} />
+      {/* Radio: when a track ends, tune to the next one */}
+      <audio ref={audioRef} src={TRACKS[track].url} onEnded={onTrackEnded} />
 
       {/* Sound line over the image, reacting to the music */}
       <canvas
@@ -131,8 +156,8 @@ export default function MusicPlayer() {
         }`}
       />
 
-      {/* Player pill, bottom left */}
-      <div className="absolute bottom-4 left-4 sm:bottom-6 sm:left-6 flex items-center gap-3 bg-black/60 backdrop-blur-md rounded-full pl-1.5 pr-4 py-1.5">
+      {/* Radio pill, bottom left */}
+      <div className="absolute bottom-4 left-4 sm:bottom-6 sm:left-6 flex items-center gap-3 bg-black/60 backdrop-blur-md rounded-full pl-1.5 pr-3 py-1.5">
         <button
           onClick={toggle}
           aria-label={playing ? 'Pause' : 'Play'}
@@ -144,14 +169,21 @@ export default function MusicPlayer() {
             <Play className="w-4 h-4 sm:w-5 sm:h-5 text-black fill-black translate-x-[1px]" />
           )}
         </button>
-        <div className="flex flex-col">
-          <span className="text-[10px] sm:text-xs" style={{ color: '#E1E0CC' }}>
-            {TRACK_TITLE}
+        <div className="flex flex-col min-w-[7rem]">
+          <span className="text-[10px] sm:text-xs whitespace-nowrap" style={{ color: '#E1E0CC' }}>
+            {TRACKS[track].title}
           </span>
           <span className="text-[9px] sm:text-[10px] text-gray-500">
-            {playing ? 'Now playing' : 'Paused'}
+            {playing ? 'On air' : 'Paused'} &middot; {track + 1}/{TRACKS.length}
           </span>
         </div>
+        <button
+          onClick={nextTrack}
+          aria-label="Next track"
+          className="w-7 h-7 sm:w-8 sm:h-8 rounded-full flex items-center justify-center text-primary/70 hover:text-primary transition-colors"
+        >
+          <SkipForward className="w-4 h-4 sm:w-[18px] sm:h-[18px] fill-current" />
+        </button>
       </div>
     </>
   )
