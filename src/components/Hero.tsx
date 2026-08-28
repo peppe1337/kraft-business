@@ -1,15 +1,45 @@
+import { useCallback, useEffect, useState } from 'react'
 import { motion } from 'framer-motion'
 // import { ArrowRight } from 'lucide-react'
 // import { WordsPullUp } from './WordsPullUp'
 import MusicPlayer from './MusicPlayer'
 import NameTag from './NameTag'
 import AgentTicker from './AgentTicker'
+import AvatarLayer from './AvatarLayer'
+import AvatarJoin from './AvatarJoin'
+import { Avatar } from '../avatars/types'
+import { backend, MY_AVATAR_KEY } from '../avatars/backend'
+import { demoAvatars, demoMode } from '../avatars/demo'
 
 // const NAV_ITEMS = ['Our story', 'Collective', 'Workshops', 'Programs', 'Inquiries']
 
 // const EASE = [0.16, 1, 0.3, 1] as const
 
 export default function Hero() {
+  const [avatars, setAvatars] = useState<Avatar[]>([])
+  const [myId, setMyId] = useState<string | null>(null)
+
+  const refresh = useCallback(() => {
+    void backend.list().then((list) => setAvatars(demoMode() ? demoAvatars() : list))
+    try {
+      setMyId(localStorage.getItem(MY_AVATAR_KEY))
+    } catch {
+      /* ignore */
+    }
+  }, [])
+
+  useEffect(() => {
+    // Returning visitor: reset the 7-day expiry, then load the island.
+    let stored: string | null = null
+    try {
+      stored = localStorage.getItem(MY_AVATAR_KEY)
+    } catch {
+      /* ignore */
+    }
+    const boot = stored ? backend.heartbeat(stored) : Promise.resolve()
+    void boot.then(refresh)
+  }, [refresh])
+
   return (
     <section className="h-screen p-4 md:p-6">
       <div className="relative h-full w-full rounded-2xl md:rounded-[2rem] overflow-hidden">
@@ -22,6 +52,7 @@ export default function Hero() {
           muted
           playsInline
         />
+        <AvatarLayer avatars={avatars} myId={myId} />
         <div className="noise-overlay absolute inset-0 opacity-[0.7] mix-blend-overlay pointer-events-none" />
         <div className="absolute inset-0 bg-gradient-to-b from-black/30 via-transparent to-black/60 pointer-events-none" />
 
@@ -36,6 +67,8 @@ export default function Hero() {
         >
           <AgentTicker />
         </motion.div>
+
+        <AvatarJoin avatars={avatars} myId={myId} onChange={refresh} />
 
         <MusicPlayer />
 
