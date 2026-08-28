@@ -2,8 +2,8 @@ import { useEffect, useRef, useState } from 'react'
 import { Pause, Play, SkipForward } from 'lucide-react'
 
 const TRACKS = [
-  { url: '/lost-rupee-drift.mp3', title: 'Lost Rupee Drift' },
-  { url: '/stand-with-me-now.mp3', title: 'Stand with me now' },
+  { url: '/lost-rupee-drift.mp3', title: 'Lost Rupee Drift (LoZ)' },
+  { url: '/stand-with-me-now.mp3', title: 'Stand with me now (FFX)' },
 ]
 
 export default function MusicPlayer() {
