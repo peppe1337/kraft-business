@@ -4,7 +4,6 @@ import { motion } from 'framer-motion'
 import MusicPlayer from './MusicPlayer'
 import NameTag from './NameTag'
 import AgentTicker from './AgentTicker'
-import HeroScene from './HeroScene'
 
 // const NAV_ITEMS = ['Our story', 'Collective', 'Workshops', 'Programs', 'Inquiries']
 
@@ -14,7 +13,15 @@ export default function Hero() {
   return (
     <section className="h-screen p-4 md:p-6">
       <div className="relative h-full w-full rounded-2xl md:rounded-[2rem] overflow-hidden">
-        <HeroScene />
+        <video
+          className="absolute inset-0 h-full w-full object-cover"
+          src="/hero-loop.mp4"
+          poster="/hero-poster.jpg"
+          autoPlay
+          loop
+          muted
+          playsInline
+        />
         <div className="noise-overlay absolute inset-0 opacity-[0.7] mix-blend-overlay pointer-events-none" />
         <div className="absolute inset-0 bg-gradient-to-b from-black/30 via-transparent to-black/60 pointer-events-none" />
 
