@@ -4,6 +4,7 @@ import { Pause, Play, SkipForward } from 'lucide-react'
 const TRACKS = [
   { url: '/lost-rupee-drift.mp3', title: 'Lost Rupee Drift (LoZ)' },
   { url: '/stand-with-me-now.mp3', title: 'Stand with me now (FFX)' },
+  { url: '/loot-runner.mp3', title: 'Loot Runner (DB2)' },
 ]
 
 export default function MusicPlayer() {
